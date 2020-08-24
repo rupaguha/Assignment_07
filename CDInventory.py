@@ -1,8 +1,9 @@
 #------------------------------------------#
 # Title: CDInventory.py
-# Desc: Working with classes and functions.
+# Desc: Working with text file operations and error handling.
 # Change Log: (Who, When, What)
-# Rupa Guha, 2020-Aug-16, Created File
+# Rupa Guha, 2020-Aug-23, Created File from last week's homework assignment
+# Rupa Guha, 2020-Aug-23, Modified - implemented suggested changes and corrected errors
 #------------------------------------------#
 
 # -- DATA -- #
@@ -14,9 +15,11 @@ objFile = None  # file object
 
 
 # -- PROCESSING -- #
+
 class DataProcessor:
-    # TODO add functions for processing here
-    def input_data_process(idCd, cdTitle, cdArtist):
+    # TODone add functions for processing here
+    @staticmethod
+    def input_data_process(idCd, cdTitle, cdArtist, lstTbl):
         """Function to add user input data to table
 
         Reads the data from file identified by file_name into a 2D table
@@ -31,8 +34,9 @@ class DataProcessor:
         intID = int(idCd)
         dicRow = {'ID': intID, 'Title': cdTitle, 'Artist': cdArtist}
         lstTbl.append(dicRow)
-    
-    def delete_row(rowId):
+
+    @staticmethod
+    def delete_row(rowId, lstTbl):
         """Function to delete row from the inventory
 
         Args:
@@ -53,7 +57,6 @@ class DataProcessor:
             print('The CD was removed')
         else:
             print('Could not find this CD!')
-    #pass
 
 
 class FileProcessor:
@@ -84,34 +87,6 @@ class FileProcessor:
             ("Something happened here - maybe there is nothing in the file yet?")
         objFile.close()
 
-    @staticmethod
-    def write_file(file_name, table):
-        """Function to manage data from file to a list of dictionaries
-
-        Writes the data from a 2D table (list of dicts) into a long string and saved into a text file.
-
-        Args:
-            file_name (string): name of file used to write the data to
-            table (list of dict): 2D data structure (list of dicts) that holds the data during runtime
-
-        Returns:
-            None.
-        """
-
-        # ADDED - TODO Add code here
-        new_line = ""
-        objFile = None
-        
-        for row in table:
-            print(row)
-            for item in row.values():
-                new_line = new_line + str(item) + ","
-            new_line = new_line[:-1] + "\n"
-
-        objFile = open(strFileName, "w")    
-        objFile.write(new_line)    
-        objFile.close()
-        print("Data saved!")
         
     def save_file(file_name, table):
         """Function to save the text file
@@ -131,7 +106,7 @@ class FileProcessor:
             lstValues[0] = str(lstValues[0])
             objFile.write(','.join(lstValues) + '\n')
         objFile.close()
-        #pass
+        print("Data saved!")
 
 
 # -- PRESENTATION (Input/Output) -- #
@@ -188,7 +163,7 @@ class IO:
             print('{}\t{} (by:{})'.format(*row.values()))
         print('======================================')
 
-    # TODO add I/O functions as needed
+    # TODone add I/O functions as needed
     def ask_user_data():
         """Asks for user data
         
@@ -232,12 +207,12 @@ while True:
     # 3.3 process add a CD
     elif strChoice == 'a':
         # 3.3.1 Ask user for new ID, CD Title and Artist
-        # ADDED TODO move IO code into function
+        # TODone move IO code into function
         strID, strTitle, stArtist = IO.ask_user_data()
 
         # 3.3.2 Add item to the table
-        # ADDED TODO move processing code into function
-        DataProcessor.input_data_process(strID, strTitle, stArtist)
+        # TODone move processing code into function
+        DataProcessor.input_data_process(strID, strTitle, stArtist, lstTbl)
         IO.show_inventory(lstTbl)
         continue  # start loop back at top.
     
@@ -254,8 +229,8 @@ while True:
         # 3.5.1.2 ask user which ID to remove
         intIDDel = int(input('Which ID would you like to delete? ').strip())
         # 3.5.2 search thru table and delete CD
-        # ADDED TODO move processing code into function
-        DataProcessor.delete_row(intIDDel)
+        # TODone move processing code into function
+        DataProcessor.delete_row(intIDDel, lstTbl)
         
         IO.show_inventory(lstTbl)
         continue  # start loop back at top.
@@ -268,7 +243,7 @@ while True:
         # 3.6.2 Process choice
         if strYesNo == 'y':
             # 3.6.2.1 save data
-            # ADDED TODO move processing code into function
+            # TODone move processing code into function
             FileProcessor.save_file(strFileName, lstTbl)
         else:
             input('The inventory was NOT saved to file. Press [ENTER] to return to the menu.')
