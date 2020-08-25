@@ -4,6 +4,7 @@
 # Change Log: (Who, When, What)
 # Rupa Guha, 2020-Aug-23, Created File from last week's homework assignment
 # Rupa Guha, 2020-Aug-23, Modified - implemented suggested changes and corrected errors
+# Rupa Guha, 2020-Aug-23, Modified - added error handling
 #------------------------------------------#
 
 # -- DATA -- #
@@ -19,7 +20,7 @@ objFile = None  # file object
 class DataProcessor:
     # TODone add functions for processing here
     @staticmethod
-    def input_data_process(idCd, cdTitle, cdArtist, lstTbl):
+    def input_data_process(intID, cdTitle, cdArtist, lstTbl):
         """Function to add user input data to table
 
         Reads the data from file identified by file_name into a 2D table
@@ -31,7 +32,6 @@ class DataProcessor:
         Returns:
             None.
         """
-        intID = int(idCd)
         dicRow = {'ID': intID, 'Title': cdTitle, 'Artist': cdArtist}
         lstTbl.append(dicRow)
 
@@ -77,17 +77,29 @@ class FileProcessor:
             None.
         """
         table.clear()  # this clears existing data and allows to load data from file
-        objFile = open(file_name, 'r')
+        
+        # catching errors like empty file or file not found
         try:
+            objFile = open(file_name, 'r')
+            
             for line in objFile:
                 data = line.strip().split(',')
                 dicRow = {'ID': int(data[0]), 'Title': data[1], 'Artist': data[2]}
                 table.append(dicRow)
-        except:
-            ("Something happened here - maybe there is nothing in the file yet?")
-        objFile.close()
-
+                
+            objFile.close()
+            
+        except FileNotFoundError as e:
+            print("It looks like the file does not exist.")
+            print("Error info: ")
+            print(type(e),e, sep="\n")
+            
+        except ValueError as e:
+            print("It looks like the file is empty.")
+            print("Error info: ")
+            print(type(e),e, sep="\n")
         
+            
     def save_file(file_name, table):
         """Function to save the text file
 
@@ -164,17 +176,25 @@ class IO:
         print('======================================')
 
     # TODone add I/O functions as needed
+    @staticmethod
     def ask_user_data():
         """Asks for user data
         
         Args: None
         Returns: The ID, the CD Title and the Artist of the title
         """
-        ID = input('Enter ID: ').strip()
-        Title = input('What is the CD\'s title? ').strip()
-        Artist = input('What is the Artist\'s name? ').strip()
-        return ID, Title, Artist
         
+        # catching errors like entering non-numeric entries
+        try:
+            ID = int(input('Enter ID: ').strip())
+            Title = input('What is the CD\'s title? ').strip()
+            Artist = input('What is the Artist\'s name? ').strip()
+            return ID, Title, Artist
+        except ValueError as e:
+            print("Only numbers allowed for ID")
+            print("Error info: ")
+            print(type(e),e, sep="\n")
+            
 
 # 1. When program starts, read in the currently saved Inventory
 FileProcessor.read_file(strFileName, lstTbl)
@@ -206,13 +226,22 @@ while True:
     
     # 3.3 process add a CD
     elif strChoice == 'a':
-        # 3.3.1 Ask user for new ID, CD Title and Artist
-        # TODone move IO code into function
-        strID, strTitle, stArtist = IO.ask_user_data()
-
+        
+        # catching error when erroneous data was not passed from IO.ask_user_data()
+        try:
+            # 3.3.1 Ask user for new ID, CD Title and Artist
+            # TODone move IO code into function
+            intID, strTitle, stArtist = IO.ask_user_data()
+        
+        except TypeError as e:
+            print("Error in data entry.")
+            print("Error info: ")
+            print(type(e),e, sep="\n")
+            continue
+                       
         # 3.3.2 Add item to the table
         # TODone move processing code into function
-        DataProcessor.input_data_process(strID, strTitle, stArtist, lstTbl)
+        DataProcessor.input_data_process(intID, strTitle, stArtist, lstTbl)
         IO.show_inventory(lstTbl)
         continue  # start loop back at top.
     
@@ -226,12 +255,20 @@ while True:
         # 3.5.1 get Userinput for which CD to delete
         # 3.5.1.1 display Inventory to user
         IO.show_inventory(lstTbl)
-        # 3.5.1.2 ask user which ID to remove
-        intIDDel = int(input('Which ID would you like to delete? ').strip())
-        # 3.5.2 search thru table and delete CD
-        # TODone move processing code into function
-        DataProcessor.delete_row(intIDDel, lstTbl)
         
+        # catching error when non-numeric data is entered by user
+        try:
+            # 3.5.1.2 ask user which ID to remove
+            intIDDel = int(input('Which ID would you like to delete? ').strip())
+            # 3.5.2 search thru table and delete CD
+            # TODone move processing code into function
+            DataProcessor.delete_row(intIDDel, lstTbl)
+        except ValueError as e:
+            print("Only numbers are allowed!")
+            print("Error info: ")
+            print(type(e),e, sep="\n")
+            continue
+            
         IO.show_inventory(lstTbl)
         continue  # start loop back at top.
     
