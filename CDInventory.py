@@ -6,6 +6,7 @@
 # Rupa Guha, 2020-Aug-25, Modified - implemented suggested changes and corrected errors
 # Rupa Guha, 2020-Aug-25, Modified - added error handling
 # Rupa Guha, 2020-Aug-25, Modified - added binary store read/write code
+# Rupa Guha, 2020-Aug-25, Modified - added the dunder docs to the error handling code
 #------------------------------------------#
 
 import pickle
@@ -100,12 +101,12 @@ class FileProcessor:
         except FileNotFoundError as e:
             print("It looks like the file does not exist.")
             print("Error info: ")
-            print(type(e),e, sep="\n")
+            print(type(e),e,e.__doc__, sep="\n")
             
         except ValueError as e:
             print("It looks like the file is empty.")
             print("Error info: ")
-            print(type(e),e, sep="\n")
+            print(type(e),e,e.__doc__, sep="\n")
         
             
     def save_file(file_name, table):
@@ -206,7 +207,7 @@ class IO:
         except ValueError as e:
             print("Only numbers allowed for ID")
             print("Error info: ")
-            print(type(e),e, sep="\n")
+            print(type(e),e,e.__doc__, sep="\n")
             
 
 # 1. When program starts, read in the currently saved Inventory
@@ -279,7 +280,7 @@ while True:
         except ValueError as e:
             print("Only numbers are allowed!")
             print("Error info: ")
-            print(type(e),e, sep="\n")
+            print(type(e),e,e.__doc__, sep="\n")
             continue
             
         IO.show_inventory(lstTbl)
