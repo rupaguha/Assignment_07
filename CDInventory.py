@@ -3,15 +3,18 @@
 # Desc: Working with text file operations and error handling.
 # Change Log: (Who, When, What)
 # Rupa Guha, 2020-Aug-23, Created File from last week's homework assignment
-# Rupa Guha, 2020-Aug-23, Modified - implemented suggested changes and corrected errors
-# Rupa Guha, 2020-Aug-23, Modified - added error handling
+# Rupa Guha, 2020-Aug-25, Modified - implemented suggested changes and corrected errors
+# Rupa Guha, 2020-Aug-25, Modified - added error handling
+# Rupa Guha, 2020-Aug-25, Modified - added binary store read/write code
 #------------------------------------------#
+
+import pickle
 
 # -- DATA -- #
 strChoice = '' # User input
 lstTbl = []  # list of lists to hold data
 dicRow = {}  # list of data row
-strFileName = 'CDInventory.txt'  # data storage file
+strFileName = 'CDInventory.dat'  # data storage file
 objFile = None  # file object
 
 
@@ -80,11 +83,16 @@ class FileProcessor:
         
         # catching errors like empty file or file not found
         try:
-            objFile = open(file_name, 'r')
+            objFile = open(file_name, 'rb')
+            row_line = []
             
-            for line in objFile:
-                data = line.strip().split(',')
-                dicRow = {'ID': int(data[0]), 'Title': data[1], 'Artist': data[2]}
+            data = pickle.load(objFile)
+            
+            lstData = data.strip().split('\n')
+            
+            for item in lstData:
+                row_line = item.strip().split(',')
+                dicRow = {'ID': int(row_line[0]), 'Title': row_line[1], 'Artist': row_line[2]}
                 table.append(dicRow)
                 
             objFile.close()
@@ -112,11 +120,16 @@ class FileProcessor:
         Returns:
             None.
         """
-        objFile = open(file_name, 'w')
+        objFile = open(file_name, 'wb')
+        new_line = ""
+        
         for row in table:
-            lstValues = list(row.values())
-            lstValues[0] = str(lstValues[0])
-            objFile.write(','.join(lstValues) + '\n')
+            print(row)
+            for item in row.values():
+                new_line = new_line + str(item) + ","
+            new_line = new_line[:-1] + "\n"
+
+        pickle.dump(new_line, objFile)  
         objFile.close()
         print("Data saved!")
 
